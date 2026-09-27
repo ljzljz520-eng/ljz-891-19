@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: auth_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_system
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "18891:3306"
+    networks:
+      - app_network
+
+  backend:
+    build: ./backend
+    container_name: auth_backend
+    restart: always
+    ports:
+      - "8891:80"
+    volumes:
+      - ./backend/src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  frontend:
+    build: ./frontend
+    container_name: auth_frontend
+    restart: always
+    ports:
+      - "3891:80"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:
