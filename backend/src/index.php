@@ -63,6 +63,14 @@ elseif ($uri === '/api/license/delete' && $_SERVER['REQUEST_METHOD'] === 'POST')
     $license = new LicenseController($db);
     $license->delete();
 }
+elseif ($uri === '/api/license/import-preview' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $license = new LicenseController($db);
+    $license->importPreview();
+}
+elseif ($uri === '/api/license/import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $license = new LicenseController($db);
+    $license->importConfirm();
+}
 // Admin Management Routes
 elseif ($uri === '/api/auth/list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $auth = new AuthController($db);

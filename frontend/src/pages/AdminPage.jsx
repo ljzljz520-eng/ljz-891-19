@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Lock, User, Plus, Trash2, Search, Sliders, Users, Shield } from 'lucide-react';
+import { Lock, User, Plus, Trash2, Search, Sliders, Users, Shield, Upload } from 'lucide-react';
 import Modal from '../components/Modal';
+import ImportModal from '../components/ImportModal';
 
 export default function AdminPage() {
   const [token, setToken] = useState(localStorage.getItem('auth_token'));
@@ -22,6 +23,7 @@ export default function AdminPage() {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteType, setDeleteType] = useState('license'); // 'license' or 'admin'
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   // Admin Management State
   const [activeTab, setActiveTab] = useState('license'); // 'license' | 'admin'
@@ -236,6 +238,20 @@ export default function AdminPage() {
                       <Plus size={16} /> {activeTab === 'license' ? '立即授权' : '添加管理员'}
                     </button>
                  </div>
+                 {activeTab === 'license' && (
+                    <div className="pt-4 mt-4 border-t border-white/5">
+                      <button
+                        type="button"
+                        onClick={() => setIsImportOpen(true)}
+                        className="w-full flex justify-center items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-sky-500/15 text-white/70 hover:text-sky-300 border border-white/10 hover:border-sky-500/30 transition text-sm"
+                      >
+                        <Upload size={15} /> 批量导入授权（CSV）
+                      </button>
+                      <p className="text-xs text-white/30 mt-2 text-center">
+                        上传旧授权表 CSV，预览校验后批量写入
+                      </p>
+                    </div>
+                 )}
               </form>
           </div>
         </div>
@@ -369,16 +385,22 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <Modal 
+      <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDelete}
         title={deleteType === 'license' ? "确认删除授权" : "确认删除管理员"}
         type="danger"
-        content={deleteType === 'license' 
-            ? "您确定要删除此授权吗？删除后该用户将无法查询到授权信息，此操作不可恢复。" 
+        content={deleteType === 'license'
+            ? "您确定要删除此授权吗？删除后该用户将无法查询到授权信息，此操作不可恢复。"
             : "您确定要删除此管理员吗？删除后该账号将无法登录后台。"
         }
+      />
+
+      <ImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImported={fetchLicenses}
       />
     </div>
   );
